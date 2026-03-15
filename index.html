@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Police Response Deserts — Detroit 911 Equity Analysis</title>
+  <meta name="description" content="Mapping 911 call response time inequality across Detroit neighborhoods using 2022 open data." />
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="src/style.css" />
+</head>
+<body>
+
+<!-- Loading overlay -->
+<div id="loading">
+  <div class="spinner"></div>
+  <div class="loading-text">Loading Detroit 911 data…</div>
+</div>
+
+<div id="app">
+
+  <!-- ── Header ── -->
+  <header>
+    <div class="logo">Police <span>Response Deserts</span></div>
+    <span class="badge">Detroit, MI · 2022</span>
+    <span class="badge">279K Calls Analyzed</span>
+    <nav>
+      <button class="active" data-target="main">Map</button>
+      <button data-target="about-view">About & Methods</button>
+    </nav>
+  </header>
+
+  <!-- ── Stats bar ── -->
+  <div id="stats-bar">
+    <div class="stat-item">
+      <span class="stat-label">Median Response · All Calls</span>
+      <span class="stat-value yellow" id="stat-median-all">—</span>
+      <span class="stat-sub">Citywide</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Median Response · Priority 1</span>
+      <span class="stat-value red" id="stat-median-p1">—</span>
+      <span class="stat-sub">Emergencies only</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Daytime Response</span>
+      <span class="stat-value green" id="stat-median-day">—</span>
+      <span class="stat-sub">6am – 6pm</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Nighttime Response</span>
+      <span class="stat-value yellow" id="stat-median-night">—</span>
+      <span class="stat-sub">6pm – 6am</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Total 911 Calls</span>
+      <span class="stat-value" id="stat-calls">—</span>
+      <span class="stat-sub">2022 police-dispatched</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Census Tracts</span>
+      <span class="stat-value" id="stat-tracts">—</span>
+      <span class="stat-sub">Wayne County</span>
+    </div>
+  </div>
+
+  <!-- ── Map view ── -->
+  <div id="main" class="view">
+
+    <!-- Map -->
+    <div id="map"></div>
+
+    <!-- Side panel -->
+    <aside id="panel">
+
+      <!-- Controls -->
+      <div class="panel-section">
+        <h3>Display Metric</h3>
+        <div class="control-row">
+          <select id="metric-select">
+            <option value="median_response_all">Median Response — All Calls</option>
+            <option value="median_response_p1">Median Response — Priority 1</option>
+            <option value="median_response_day">Daytime Response (6am–6pm)</option>
+            <option value="median_response_night">Nighttime Response (6pm–6am)</option>
+            <option value="pct_nonwhite">% Non-White Population</option>
+            <option value="median_income">Median Household Income</option>
+            <option value="equity_residual">Equity Residual</option>
+          </select>
+        </div>
+        <div style="font-size:10px;color:var(--text-muted);margin-top:4px">
+          Click any census tract to see full details
+        </div>
+      </div>
+
+      <!-- Address lookup -->
+      <div class="panel-section">
+        <h3>Neighborhood Lookup</h3>
+        <div class="control-row">
+          <input type="text" id="address-input" placeholder="Enter Detroit address…" />
+          <button class="btn" id="address-btn">Look Up</button>
+        </div>
+        <div style="font-size:10px;color:var(--text-muted);margin-top:4px">
+          Find your neighborhood's response time stats
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div class="panel-section">
+        <h3>Legend</h3>
+        <div class="legend" id="legend"></div>
+      </div>
+
+      <!-- Tract info -->
+      <div class="panel-section">
+        <h3>Tract Details</h3>
+        <div id="tract-info">
+          <div class="empty">Click a census tract on the map</div>
+        </div>
+      </div>
+
+      <!-- Scatterplot -->
+      <div id="scatter-container">
+        <h3>Income vs Response Time</h3>
+        <svg id="scatter-svg" width="100%" height="180"></svg>
+      </div>
+
+      <!-- Methodology summary -->
+      <div id="methodology" class="panel-section">
+        <h3>Key Findings</h3>
+        <div id="methodology-content"></div>
+      </div>
+
+    </aside>
+  </div>
+
+  <!-- ── About view ── -->
+  <div id="about-view" class="view" style="display:none; overflow-y:auto; padding:32px; max-width:860px; margin:0 auto;">
+    <h1 style="font-size:24px; margin-bottom:8px">Police Response Deserts</h1>
+    <h2 style="font-size:16px; color:var(--text-muted); font-weight:400; margin-bottom:24px">
+      Mapping 911 Call Response Time Inequality Across Detroit Neighborhoods
+    </h2>
+
+    <section style="margin-bottom:28px">
+      <h3 style="color:var(--accent); margin-bottom:12px">Research Question</h3>
+      <p style="color:var(--text-muted); line-height:1.8">
+        When you call 911, how quickly police arrive depends enormously on where you live. This project
+        uses <strong>real Detroit 911 call-for-service records</strong> with timestamps to calculate
+        actual median response times at the census tract level, maps the spatial inequality, and tests
+        whether response time correlates with race and income after controlling for call volume and
+        station proximity.
+      </p>
+    </section>
+
+    <section style="margin-bottom:28px">
+      <h3 style="color:var(--accent); margin-bottom:12px">Data Sources</h3>
+      <ul style="color:var(--text-muted); line-height:2; padding-left:20px">
+        <li><a href="https://hub.arcgis.com/datasets/detroitmi::police-serviced-911-calls-2022" target="_blank">Detroit Police 911 Calls for Service 2022</a> — Detroit Open Data Portal (297,417 records)</li>
+        <li><a href="https://www.census.gov/data/developers/data-sets/acs-5year.html" target="_blank">American Community Survey 5-Year Estimates (2022)</a> — U.S. Census Bureau</li>
+        <li><a href="https://tigerweb.geo.census.gov/" target="_blank">TIGER/Line Census Tract Boundaries</a> — Wayne County, Michigan</li>
+        <li><a href="https://hub.arcgis.com/datasets/detroitmi::police-stations-detroit-2012" target="_blank">Detroit Police Precincts</a> — Detroit Open Data Portal</li>
+      </ul>
+    </section>
+
+    <section style="margin-bottom:28px">
+      <h3 style="color:var(--accent); margin-bottom:12px">Methodology</h3>
+      <ol style="color:var(--text-muted); line-height:2; padding-left:20px">
+        <li>Downloaded 297,417 Detroit 911 police calls from 2022 via ArcGIS REST API</li>
+        <li>Filtered to valid response times (0–240 minutes), retaining 281,725 calls</li>
+        <li>Spatially joined call locations to 627 Wayne County census tracts (TIGER/Line)</li>
+        <li>Aggregated by tract: median response, 90th percentile, day/night splits, call volume</li>
+        <li>Joined ACS 2022 demographics: % non-white (B03002), median income (B19013)</li>
+        <li>Computed distance from each tract centroid to nearest police precinct</li>
+        <li>Ran OLS multivariate regression to test equity predictors</li>
+      </ol>
+    </section>
+
+    <section style="margin-bottom:28px">
+      <h3 style="color:var(--accent); margin-bottom:12px">Regression Results</h3>
+      <div style="background:var(--surface2); border-radius:8px; padding:16px; margin-bottom:12px">
+        <p style="color:var(--text-muted); margin-bottom:12px">
+          OLS regression: dependent variable = tract median Priority 1 response time (n=270 tracts)
+        </p>
+        <table style="width:100%; border-collapse:collapse; font-size:12px">
+          <thead>
+            <tr style="border-bottom:1px solid var(--border); color:var(--text-muted)">
+              <th style="text-align:left; padding:6px 8px">Variable</th>
+              <th style="text-align:right; padding:6px 8px">Coefficient</th>
+              <th style="text-align:right; padding:6px 8px">p-value</th>
+              <th style="text-align:left; padding:6px 8px">Result</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom:1px solid var(--border)">
+              <td style="padding:6px 8px">Distance to nearest precinct (km)</td>
+              <td style="text-align:right; padding:6px 8px; color:var(--danger)">+0.654</td>
+              <td style="text-align:right; padding:6px 8px">&lt;0.001</td>
+              <td style="padding:6px 8px; color:var(--danger)">★ Significant</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border)">
+              <td style="padding:6px 8px">Median household income</td>
+              <td style="text-align:right; padding:6px 8px; color:var(--good)">−0.147</td>
+              <td style="text-align:right; padding:6px 8px">0.048</td>
+              <td style="padding:6px 8px; color:var(--warn)">★ Significant</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border)">
+              <td style="padding:6px 8px">% Non-white population</td>
+              <td style="text-align:right; padding:6px 8px">−0.142</td>
+              <td style="text-align:right; padding:6px 8px">0.068</td>
+              <td style="padding:6px 8px; color:var(--text-muted)">Marginal (p&lt;0.10)</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border)">
+              <td style="padding:6px 8px">Call volume per tract</td>
+              <td style="text-align:right; padding:6px 8px">+0.029</td>
+              <td style="text-align:right; padding:6px 8px">0.693</td>
+              <td style="padding:6px 8px; color:var(--text-muted)">Not significant</td>
+            </tr>
+            <tr>
+              <td style="padding:6px 8px">Population density</td>
+              <td style="text-align:right; padding:6px 8px">−0.012</td>
+              <td style="text-align:right; padding:6px 8px">0.869</td>
+              <td style="padding:6px 8px; color:var(--text-muted)">Not significant</td>
+            </tr>
+          </tbody>
+        </table>
+        <div style="margin-top:10px; font-size:11px; color:var(--text-muted)">R² = 0.257 · Model explains 26% of variance in tract-level response times</div>
+      </div>
+      <p style="color:var(--text-muted); font-size:12px; line-height:1.8">
+        <strong style="color:var(--text)">Key finding:</strong> After controlling for distance to the nearest precinct (the strongest
+        operational predictor), lower-income tracts still receive statistically slower response
+        (p=0.048). The race coefficient trends in the same direction but falls just short of
+        conventional significance (p=0.068), consistent with partially income-mediated racial
+        disparities in service access.
+      </p>
+    </section>
+
+    <section style="margin-bottom:28px">
+      <h3 style="color:var(--accent); margin-bottom:12px">About This Project</h3>
+      <p style="color:var(--text-muted); line-height:1.8">
+        Built as a portfolio data project demonstrating spatial analysis, equity research methodology,
+        and full-stack GIS web development. All data is publicly available. Analysis code is available
+        in the repository's <code>notebooks/</code> folder.
+      </p>
+      <p style="color:var(--text-muted); line-height:1.8; margin-top:8px">
+        Data year: 2022 · City: Detroit, Michigan · Boundaries: Wayne County Census Tracts (TIGER 2020)
+      </p>
+    </section>
+  </div>
+
+  <!-- ── Footer ── -->
+  <footer>
+    <span>Data: Detroit Open Data · ACS 2022 · TIGER/Line</span>
+    <span>Analysis: 2022 police-dispatched calls only</span>
+    <span>Map tiles: CARTO Dark Matter · OpenStreetMap</span>
+    <span>Boundaries: Wayne County Census Tracts</span>
+  </footer>
+
+</div>
+
+<!-- Tooltip for scatter -->
+<div class="scatter-tooltip" id="scatter-tooltip"></div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<!-- Turf.js for point-in-polygon (address lookup) -->
+<script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
+<!-- App -->
+<script src="src/app.js"></script>
+
+</body>
+</html>

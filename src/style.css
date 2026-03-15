@@ -1,0 +1,400 @@
+/* =====================================================
+   Detroit Police Response Desert - Styles
+   ===================================================== */
+
+:root {
+  --bg:         #0f1117;
+  --surface:    #1a1d27;
+  --surface2:   #22263a;
+  --border:     #2e3250;
+  --text:       #e8eaf6;
+  --text-muted: #8b92b8;
+  --accent:     #6c8fff;
+  --danger:     #ff6b6b;
+  --warn:       #ffd166;
+  --good:       #06d6a0;
+  --font:       'Inter', system-ui, sans-serif;
+  --radius:     8px;
+  --shadow:     0 4px 24px rgba(0,0,0,.5);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ── Layout ── */
+#app {
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/* ── Header ── */
+header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+header .logo {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+}
+header .logo span { color: var(--danger); }
+
+.badge {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2px 10px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+header nav {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+}
+header nav button {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  border-radius: var(--radius);
+  padding: 5px 12px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all .15s;
+}
+header nav button:hover,
+header nav button.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+/* ── Stats bar ── */
+#stats-bar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  padding: 0 10px;
+}
+
+.stat-item {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  padding: 8px 18px;
+  border-right: 1px solid var(--border);
+  min-width: 140px;
+}
+.stat-item:last-child { border-right: none; }
+.stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: var(--text-muted); }
+.stat-value { font-size: 20px; font-weight: 700; line-height: 1.2; margin-top: 2px; }
+.stat-sub   { font-size: 10px; color: var(--text-muted); }
+.stat-value.red   { color: var(--danger); }
+.stat-value.green { color: var(--good); }
+.stat-value.yellow { color: var(--warn); }
+
+/* ── Main content ── */
+#main {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  overflow: hidden;
+}
+
+/* ── Map ── */
+#map {
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+  background: #0d0f1a;
+}
+
+/* ── Side panel ── */
+#panel {
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.panel-section {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.panel-section h3 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+/* Controls */
+.control-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+.control-row label {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+
+select, input[type="text"] {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: var(--radius);
+  padding: 7px 10px;
+  font-size: 12px;
+  outline: none;
+}
+select:focus, input:focus {
+  border-color: var(--accent);
+}
+
+.btn {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  padding: 8px 14px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: opacity .15s;
+  width: 100%;
+  margin-top: 4px;
+}
+.btn:hover { opacity: .85; }
+.btn.secondary {
+  background: var(--surface2);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+/* Tract info card */
+#tract-info {
+  font-size: 12px;
+}
+#tract-info .empty {
+  color: var(--text-muted);
+  font-style: italic;
+  padding: 12px 0;
+  text-align: center;
+}
+.tract-name {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: var(--text);
+}
+.metric-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--border);
+}
+.metric-row:last-child { border-bottom: none; }
+.metric-key { color: var(--text-muted); }
+.metric-val { font-weight: 600; }
+.metric-val.slow  { color: var(--danger); }
+.metric-val.fast  { color: var(--good); }
+.metric-val.med   { color: var(--warn); }
+.compare-bar {
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin: 6px 0 4px;
+  position: relative;
+}
+.compare-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width .3s;
+}
+.compare-label {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+/* Legend */
+.legend {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.legend-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+}
+.legend-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+/* Scatterplot */
+#scatter-container {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+#scatter-container h3 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+#scatter-svg {
+  width: 100%;
+  height: 180px;
+}
+.scatter-tooltip {
+  position: absolute;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px 10px;
+  font-size: 11px;
+  pointer-events: none;
+  z-index: 1000;
+  max-width: 200px;
+  box-shadow: var(--shadow);
+  display: none;
+}
+
+/* Methodology */
+#methodology {
+  padding: 14px 16px;
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+#methodology h3 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+#methodology p { margin-bottom: 8px; }
+#methodology .finding {
+  background: var(--surface2);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 8px 12px;
+  margin: 8px 0;
+  color: var(--text);
+  font-size: 12px;
+}
+#methodology .finding.red   { border-color: var(--danger); }
+#methodology .finding.green { border-color: var(--good); }
+
+/* ── Footer ── */
+footer {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 6px 20px;
+  font-size: 10px;
+  color: var(--text-muted);
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+/* ── Leaflet overrides ── */
+.leaflet-container { background: #0d0f1a; }
+.leaflet-popup-content-wrapper {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.leaflet-popup-tip { background: var(--surface); }
+.leaflet-popup-content {
+  font-size: 12px;
+  margin: 10px 14px;
+  line-height: 1.7;
+}
+.popup-title { font-weight: 700; font-size: 13px; margin-bottom: 6px; }
+.popup-row { display: flex; justify-content: space-between; gap: 12px; }
+.popup-slow  { color: var(--danger); font-weight: 700; }
+.popup-fast  { color: var(--good);   font-weight: 700; }
+.popup-med   { color: var(--warn);   font-weight: 700; }
+
+.leaflet-control-zoom a {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+}
+.leaflet-control-attribution {
+  background: rgba(15,17,23,.8) !important;
+  color: var(--text-muted) !important;
+}
+.leaflet-control-attribution a { color: var(--text-muted) !important; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* Loading overlay */
+#loading {
+  position: fixed; inset: 0;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  gap: 16px;
+}
+#loading.hidden { display: none; }
+.spinner {
+  width: 40px; height: 40px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { color: var(--text-muted); font-size: 13px; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  #main { grid-template-columns: 1fr; grid-template-rows: 60vh auto; }
+  #panel { max-height: 40vh; border-left: none; border-top: 1px solid var(--border); }
+  #scatter-container { display: none; }
+}

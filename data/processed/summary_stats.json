@@ -1,0 +1,10 @@
+{
+  "citywide_median_response_all": 15.6,
+  "citywide_median_response_p1": 10.1,
+  "citywide_median_response_day": 14.5,
+  "citywide_median_response_night": 16.2,
+  "total_tracts_analyzed": 293,
+  "total_calls_2022": 279562,
+  "data_year": 2022,
+  "city": "Detroit, MI"
+}

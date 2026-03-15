@@ -1,0 +1,48 @@
+{
+  "r_squared": 0.2571,
+  "n_tracts": 270,
+  "coefficients": {
+    "intercept": {
+      "coef": 10.1333,
+      "se": 0.0701,
+      "t": 144.504,
+      "p": 0.0,
+      "significant": true
+    },
+    "pct_nonwhite": {
+      "coef": -0.1416,
+      "se": 0.0773,
+      "t": -1.832,
+      "p": 0.0681,
+      "significant": false
+    },
+    "median_income": {
+      "coef": -0.1469,
+      "se": 0.074,
+      "t": -1.984,
+      "p": 0.0483,
+      "significant": true
+    },
+    "call_volume": {
+      "coef": 0.0292,
+      "se": 0.074,
+      "t": 0.395,
+      "p": 0.6931,
+      "significant": false
+    },
+    "dist_station": {
+      "coef": 0.6542,
+      "se": 0.073,
+      "t": 8.957,
+      "p": 0.0,
+      "significant": true
+    },
+    "pop_density": {
+      "coef": -0.0117,
+      "se": 0.0708,
+      "t": -0.166,
+      "p": 0.8686,
+      "significant": false
+    }
+  }
+}
