@@ -1,6 +1,6 @@
 # Police Response Deserts — Detroit 911 Equity Analysis
 
-**Live site:** [View on GitHub Pages](https://[username].github.io/police-response-deserts/)
+**Live site:** [View on GitHub Pages](https://kalchikee.github.io/police-response-deserts/)
 
 An interactive web map analyzing 911 police response time inequality across Detroit census tracts using 2022 real open-data records.
 
